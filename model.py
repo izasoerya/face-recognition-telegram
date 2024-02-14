@@ -11,6 +11,7 @@ Developed by Marcelo Rovai - MJRoBot.org @ 21Feb18
 import cv2
 import numpy as np
 import os 
+import telegram
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('trainer/trainer.yml')
@@ -33,6 +34,8 @@ cam.set(4, 480) # set video height
 # Define min window size to be recognized as a face
 minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
+
+isabscence = 0
 
 while True:
 
@@ -57,7 +60,10 @@ while True:
         # Check if confidence is less them 100 ==> "0" is perfect match 
         if (confidence < 100):
             id = names[id]
+            if(isabscence==0) : telegram.send_telegram_message(id)
+            isabscence+=1
             confidence = "  {0}%".format(round(100 - confidence))
+            
         else:
             id = "unknown"
             confidence = "  {0}%".format(round(100 - confidence))
