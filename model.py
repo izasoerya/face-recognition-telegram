@@ -66,6 +66,7 @@ while True:
             
         else:
             id = "unknown"
+            if(isabscence==0) : telegram.send_telegram_message(id)
             confidence = "  {0}%".format(round(100 - confidence))
         
         cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
