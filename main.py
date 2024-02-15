@@ -62,10 +62,13 @@ while True:
         # Check if confidence is less them 100 ==> "0" is perfect match 
         if (confidence < 100):
             employee = models.employee(names[id])
+            if ((minute+1) < ft.fetch_time_minute()):
+                employee.reset_attendance()
+                minute = ft.fetch_time_minute()
             id = names[id]
             confidence = "  {0}%".format(round(100 - confidence))
-            # if((minute + 1) < ft.fetch_time_minute()) : 
-            employee.send_telegram_msg(id)
+            if(employee.check_attendance() == False) : 
+                employee.send_telegram_msg(id)
             
         else:
             id = "unknown"

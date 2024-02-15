@@ -25,5 +25,8 @@ class employee :
         if (user_data[self.name] == False): 
             user_data[self.name] = True
             telegram.send_telegram_message(id)
+    
+    def check_attendance(self) : 
+        return user_data[self.name]
 
         
