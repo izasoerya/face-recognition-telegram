@@ -11,7 +11,8 @@ Developed by Marcelo Rovai - MJRoBot.org @ 21Feb18
 import cv2
 import numpy as np
 import os 
-import telegram
+import fetch_time as ft
+import models
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('trainer/trainer.yml')
@@ -36,9 +37,10 @@ minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
 
 isabscence = 0
+minute = ft.fetch_time_minute()
+day = ft.fetch_date_day()
 
 while True:
-
     ret, img =cam.read()
     img = cv2.flip(img, 1) # Flip vertically
 
@@ -59,14 +61,15 @@ while True:
 
         # Check if confidence is less them 100 ==> "0" is perfect match 
         if (confidence < 100):
+            employee = models.employee(names[id])
             id = names[id]
-            if(isabscence==0) : telegram.send_telegram_message(id)
-            isabscence+=1
             confidence = "  {0}%".format(round(100 - confidence))
+            # if((minute + 1) < ft.fetch_time_minute()) : 
+            employee.send_telegram_msg(id)
             
         else:
             id = "unknown"
-            if(isabscence==0) : telegram.send_telegram_message(id)
+            employee = models.employee(id)
             confidence = "  {0}%".format(round(100 - confidence))
         
         cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
