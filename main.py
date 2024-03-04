@@ -28,9 +28,9 @@ id = 0
 names = ['faiz', 'iza', 'akmal', 'gilang', 'reza' ] 
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(2)
 cam.set(3, 640) # set video widht
-cam.set(4, 480) # set video height
+cam.set(4, 480) # set video he  ight
 
 # Define min window size to be recognized as a face
 minW = 0.1*cam.get(3)
