@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from PIL import Image
-import os# Path for face image database
+import os # Path for face image database
 path = 'dataset'
 recognizer = cv2.face.LBPHFaceRecognizer.create()
 detector = cv2.CascadeClassifier("Cascades/haarcascade_frontalface_default.xml");# function to get the images and label data
