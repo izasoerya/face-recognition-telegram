@@ -54,6 +54,12 @@ while True:
     )
 
     for (x, y, w, h) in faces:
+        offsetW = (5 / 100) * w
+        x = int(x - offsetW)
+        w = int(w + offsetW * 2)
+        offsetH = (5 / 100) * h
+        y = int(y - offsetH * 3)
+        h = int(h + offsetH * 3.5)
         cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Use the entire face region for prediction
@@ -86,7 +92,7 @@ while True:
             
 
         cv2.putText(img, str(id), (x+5, y-5), font, 1, (255, 255, 255), 2)
-        # cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
+        cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
 
     cv2.imshow('camera', img)
 
