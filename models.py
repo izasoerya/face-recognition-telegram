@@ -1,6 +1,5 @@
 import telegram
 
-
 user_data = {
     "faiz" : False,
     "iza" : False,
@@ -8,6 +7,8 @@ user_data = {
     "gilang" : False,
     "reza" : False,
 }
+
+cam_id = 0
 
 class employee :
     def __init__(self, name) :

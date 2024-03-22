@@ -1,12 +1,12 @@
 import cv2
-
+import models as md
 # Function to clean image by removing noise
 def clean_image(image):
     # Apply Gaussian Blur to reduce noise
     blurred_image = cv2.GaussianBlur(image, (5, 5), 0)
     return blurred_image
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(md.cam_id)
 cam.set(3, 640)  # set video width
 cam.set(4, 480)  # set video height
 face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.xml')

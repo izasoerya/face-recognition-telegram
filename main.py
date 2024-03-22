@@ -19,7 +19,7 @@ id = 0
 names = ['faiz', 'iza', 'akmal', 'gilang', 'reza']
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(models.cam_id)
 cam.set(3, 640) # set video width
 cam.set(4, 480) # set video height
 

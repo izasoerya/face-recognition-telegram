@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
-cap =  cv2.VideoCapture(0)
+import models as md
+
+cap =  cv2.VideoCapture(md.cam_id)
 cap.set(3,640)
 cap.set(4,480)
 
