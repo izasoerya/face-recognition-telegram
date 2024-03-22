@@ -50,19 +50,13 @@ while True:
     )
 
     for (x, y, w, h) in faces:
-        # Expand the bounding box to include more of the face
-        offsetW = int(0.05 * w)
-        offsetH = int(0.05 * h)
-        x -= offsetW
-        y -= offsetH
-        w += 2 * offsetW
-        h += 2 * offsetH
-
-        # Ensure the expanded bounding box is within the image bounds
-        x = max(0, x)
-        y = max(0, y)
-        w = min(img.shape[1] - x, w)
-        h = min(img.shape[0] - y, h)
+        offsetW = (5 / 100) * w
+        x = int(x - offsetW)
+        w = int(w + offsetW * 2)
+        offsetH = (5 / 100) * h
+        y = int(y - offsetH * 3)
+        h = int(h + offsetH * 3.5)
+        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Extract the ROI for face recognition
         face_roi_gray = gray[y:y+h, x:x+w]
@@ -74,20 +68,31 @@ while True:
         # Check confidence level for recognition
         confidence_text = round(100 - confidence)
         
-        if confidence_text >= 50:
-            recognized_ids.append(id)
+        if confidence_text>=50 :
+            employee = models.employee(names[id])
 
-    # Check if 5 seconds have passed
-    elapsed_time = time.time() - start_time
-    if elapsed_time >= recognizing_time:
-        # Calculate the average recognized ID
-        if recognized_ids:
-            average_id = int(round(np.mean(recognized_ids)))
-            recognized_name = names[average_id] if average_id > 0 else "unknown"
-            print("Recognized person:", recognized_name)
-            # Reset variables for next recognition cycle
-            recognized_ids = []
-            start_time = time.time()
+            # Check if the current minute is different from the last recorded minute
+            if (minute+1) < ft.fetch_time_minute():
+                employee.reset_attendance()
+                minute = ft.fetch_time_minute()
+
+            id = names[id]
+            confidence_text = "{0}%".format(confidence_text)
+
+
+            # Check attendance and send Telegram message if needed
+            # if not employee.check_attendance():
+            #     employee.send_telegram_msg(id)
+
+        elif confidence_text<50:
+            id = "unknown"
+            employee = models.employee(id)
+            confidence_text = "{0}%".format(confidence_text)
+            cv2.putText(img, "Fixed your angle camera", (x+5, y+h+20), font, 1, (0, 0, 255), 2)
+            
+
+        cv2.putText(img, str(id), (x+5, y-5), font, 1, (255, 255, 255), 2)
+        cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
 
     cv2.imshow('camera', img)
 
