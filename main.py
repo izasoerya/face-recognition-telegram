@@ -40,6 +40,9 @@ isabscence = 0
 minute = ft.fetch_time_minute()
 day = ft.fetch_date_day()
 
+
+recognition_count = 0
+
 while True:
     ret, img = cam.read()
     img = cv2.flip(img, 1)  # Flip vertically
@@ -78,8 +81,20 @@ while True:
 
             id = names[id]
             confidence_text = "{0}%".format(confidence_text)
+            
+            recognition_count += 1  # Increment recognition count
 
-
+        # Check attendance only if recognition_count reaches threshold
+            if 100>recognition_count >=  10:
+                print (id,  "telah hadir" )
+                cv2.putText(img, str(id) + " telah hadir", (x+5, y-5), font, 1, (255, 255, 255), 2)
+            
+            elif recognition_count>100:
+                print("\n [INFO] Exiting Program and cleanup stuff")
+                cam.release()
+                cv2.destroyAllWindows()
+            
+                         
             # Check attendance and send Telegram message if needed
             # if not employee.check_attendance():
             #     employee.send_telegram_msg(id)
@@ -93,7 +108,7 @@ while True:
 
         cv2.putText(img, str(id), (x+5, y-5), font, 1, (255, 255, 255), 2)
         cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
-
+    print ( recognition_count)
     cv2.imshow('camera', img)
 
     # Press 'ESC' for exiting the video
