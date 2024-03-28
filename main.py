@@ -41,7 +41,8 @@ minute = ft.fetch_time_minute()
 day = ft.fetch_date_day()
 
 
-recognition_count = 0
+recognition_count = {name: 0 for name in names}
+
 
 while True:
     ret, img = cam.read()
@@ -72,32 +73,35 @@ while True:
         confidence_text = round(100 - confidence)
         
         if confidence_text>=50 :
-            employee = models.employee(names[id])
-
+            name = names[id]
+            employee = models.employee(name)
             # Check if the current minute is different from the last recorded minute
             if (minute+1) < ft.fetch_time_minute():
                 employee.reset_attendance()
                 minute = ft.fetch_time_minute()
 
-            id = names[id]
+            # id = names[id]
             confidence_text = "{0}%".format(confidence_text)
             
-            recognition_count += 1  # Increment recognition count
+            recognition_count[name] += 1  # Increment recognition count
+            if recognition_count[name] >= 41:
+                recognition_count[name] = 0
 
-        # Check attendance only if recognition_count reaches threshold
-            if 100>recognition_count >=  10:
-                print (id,  "telah hadir" )
-                cv2.putText(img, str(id) + " telah hadir", (x+5, y-5), font, 1, (255, 255, 255), 2)
-            
-            elif recognition_count>100:
-                print("\n [INFO] Exiting Program and cleanup stuff")
-                cam.release()
-                cv2.destroyAllWindows()
+         # Perform attendance processing for the name id
+                if recognition_count[name] >= 35:
+                    print(name, "telah hadir")
+                    cv2.putText(img, name + " telah hadir", (x+5, y-5), font, 1, (255, 255, 255), 2)
+                    
+                
+                    # Check attendance and send Telegram message if needed
+                    if not employee.check_attendance():
+                        employee.send_telegram_msg(id)
+                # elif recognition_count[name]<35:
+                #     cv2.putText(img,   " ulangi", (x+5, y-5), font, 1, (255, 255, 255), 2)
+                
+                    
             
                          
-            # Check attendance and send Telegram message if needed
-            # if not employee.check_attendance():
-            #     employee.send_telegram_msg(id)
 
         elif confidence_text<50:
             id = "unknown"
@@ -106,7 +110,7 @@ while True:
             cv2.putText(img, "Fixed your angle camera", (x+5, y+h+20), font, 1, (0, 0, 255), 2)
             
 
-        cv2.putText(img, str(id), (x+5, y-5), font, 1, (255, 255, 255), 2)
+        cv2.putText(img, name, (x+5, y-5), font, 1, (255, 255, 255), 2)
         cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
     print ( recognition_count)
     cv2.imshow('camera', img)
