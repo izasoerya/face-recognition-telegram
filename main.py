@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import fetch_time as ft
 import models
 
@@ -12,9 +11,6 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 #iniciate id counter
 id = 0
-
-# names related to ids: example ==> Marcelo: id=1,  etc
-names = ['faiz', 'iza', 'akmal', 'gilang', 'reza' ] 
 
 # Initialize and start realtime video capture
 cam = cv2.VideoCapture(2)
@@ -29,14 +25,13 @@ isabscence = 0
 minute = ft.fetch_time_minute()
 day = ft.fetch_date_day()
 
-recognition_count = {name: 0 for name in names}
+recognition_count = {name: 0 for name in models.user_attendance_list}
 isrecog = False
 recogname = ""
 
 while True:
     ret, img = cam.read()
     img = cv2.flip(img, 1)  # Flip vertically
-
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     faces = faceCascade.detectMultiScale(
@@ -47,6 +42,7 @@ while True:
     )
 
     for (x, y, w, h) in faces:
+        # Draw a rectangle around the faces
         cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Use the entire face region for prediction
@@ -54,9 +50,8 @@ while True:
 
         # Check if confidence is less than 100 ==> "0" is a perfect match
         confidence_text = round(100 - confidence)
-        
         if confidence_text>=72 :
-            name = names[id]
+            name = models.user_attendance_list[id]
             employee = models.employee(name)
 
             # Check if the current minute is different from the last recorded minute
@@ -83,7 +78,6 @@ while True:
                         recogname = ""
                 recognition_count[name] = 0
                 
-
         elif confidence_text<72:
             name = "unknown"
             confidence_text = "{0}%".format(confidence_text)
