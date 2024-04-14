@@ -50,34 +50,30 @@ while True:
 
         # Check if confidence is less than 100 ==> "0" is a perfect match
         confidence_text = round(100 - confidence)
-        if confidence_text>=72 :
+        if confidence_text >= 72 :
             name = models.user_attendance_list[id]
             employee = models.employee(name)
 
-            # Check if the current minute is different from the last recorded minute
-            if (minute+1) < ft.fetch_time_minute():
+            # Reset attendance if the day has changed
+            if (minute + 1) < ft.fetch_time_minute():
                 employee.reset_attendance()
                 minute = ft.fetch_time_minute()
 
-            # id = names[id]
+            # Show the percentage of confidence
             confidence_text = "{0}%".format(confidence_text)
             
-            recognition_count[name] += 1  # Increment recognition count
+            # Average the user recognition
+            recognition_count[name] += 1  
             if recognition_count[name] >= 100:
                 if not employee.check_attendance():
                     employee.send_telegram_msg(name)
-                    # sec = ft.fetch_time_second()
-                    # if (ft.fetch_time_second() > sec + 5) : 
                     isrecog = True
                     recogname = name
-                    # else :
-                    # isrecog = False
-                    # recogname = ""
-                    if recognition_count[name] == 30:
-                        isrecog = False
-                        recogname = ""
                 recognition_count[name] = 0
-                
+
+            if recognition_count[name] == 30:
+                isrecog = False
+                recogname = ""
         elif confidence_text<72:
             name = "unknown"
             confidence_text = "{0}%".format(confidence_text)
