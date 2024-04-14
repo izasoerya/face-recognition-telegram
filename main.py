@@ -1,16 +1,5 @@
-''''
-Real Time Face Recogition
-	==> Each face stored on dataset/ dir, should have a unique numeric integer ID as 1, 2, 3, etc                       
-	==> LBPH computed model (trained faces) should be on trainer/ dir
-Based on original code by Anirban Kar: https://github.com/thecodacus/Face-Recognition    
-
-Developed by Marcelo Rovai - MJRoBot.org @ 21Feb18  
-
-'''
-
 import cv2
 import numpy as np
-import os 
 import fetch_time as ft
 import models
 
@@ -28,7 +17,7 @@ id = 0
 names = ['faiz', 'iza', 'akmal', 'gilang', 'reza' ] 
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(2)
 cam.set(3, 640) # set video widht
 cam.set(4, 480) # set video he  ight
 
@@ -40,9 +29,9 @@ isabscence = 0
 minute = ft.fetch_time_minute()
 day = ft.fetch_date_day()
 
-
 recognition_count = {name: 0 for name in names}
-
+isrecog = False
+recogname = ""
 
 while True:
     ret, img = cam.read()
@@ -58,12 +47,6 @@ while True:
     )
 
     for (x, y, w, h) in faces:
-        offsetW = (5 / 100) * w
-        x = int(x - offsetW)
-        w = int(w + offsetW * 2)
-        offsetH = (5 / 100) * h
-        y = int(y - offsetH * 3)
-        h = int(h + offsetH * 3.5)
         cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Use the entire face region for prediction
@@ -72,9 +55,10 @@ while True:
         # Check if confidence is less than 100 ==> "0" is a perfect match
         confidence_text = round(100 - confidence)
         
-        if confidence_text>=50 :
+        if confidence_text>=72 :
             name = names[id]
             employee = models.employee(name)
+
             # Check if the current minute is different from the last recorded minute
             if (minute+1) < ft.fetch_time_minute():
                 employee.reset_attendance()
@@ -84,41 +68,40 @@ while True:
             confidence_text = "{0}%".format(confidence_text)
             
             recognition_count[name] += 1  # Increment recognition count
-            if recognition_count[name] >= 41:
+            if recognition_count[name] >= 100:
+                if not employee.check_attendance():
+                    employee.send_telegram_msg(name)
+                    # sec = ft.fetch_time_second()
+                    # if (ft.fetch_time_second() > sec + 5) : 
+                    isrecog = True
+                    recogname = name
+                    # else :
+                    # isrecog = False
+                    # recogname = ""
+                    if recognition_count[name] == 30:
+                        isrecog = False
+                        recogname = ""
                 recognition_count[name] = 0
-
-         # Perform attendance processing for the name id
-                if recognition_count[name] >= 35:
-                    print(name, "telah hadir")
-                    cv2.putText(img, name + " telah hadir", (x+5, y-5), font, 1, (255, 255, 255), 2)
-                    
                 
-                    # Check attendance and send Telegram message if needed
-                    if not employee.check_attendance():
-                        employee.send_telegram_msg(id)
-                # elif recognition_count[name]<35:
-                #     cv2.putText(img,   " ulangi", (x+5, y-5), font, 1, (255, 255, 255), 2)
-                
-                    
-            
-                         
 
-        elif confidence_text<50:
-            id = "unknown"
-            employee = models.employee(id)
+        elif confidence_text<72:
+            name = "unknown"
             confidence_text = "{0}%".format(confidence_text)
             cv2.putText(img, "Fixed your angle camera", (x+5, y+h+20), font, 1, (0, 0, 255), 2)
-            
 
+        if(isrecog):    
+            cv2.putText(img, recogname + " telah hadir", (x+5, y+h+50), font, 1, (0, 0, 255), 2)
         cv2.putText(img, name, (x+5, y-5), font, 1, (255, 255, 255), 2)
         cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
-    print ( recognition_count)
+
+    print (recognition_count)
     cv2.imshow('camera', img)
 
     # Press 'ESC' for exiting the video
     k = cv2.waitKey(10) & 0xff
     if k == 27:
         break
+
 # Do a bit of cleanup
 print("\n [INFO] Exiting Program and cleanup stuff")
 cam.release()
