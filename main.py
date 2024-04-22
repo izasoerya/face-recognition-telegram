@@ -9,6 +9,14 @@ faceCascade = cv2.CascadeClassifier(cascadePath)
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
+# Read threshold values from the text file
+with open('threshold.txt', 'r') as file:
+    threshold_lines = file.readlines()
+    threshold = int(threshold_lines[1].strip())
+    reset_time = int(threshold_lines[4].strip())
+    avg_face_count = int(threshold_lines[7].strip())
+
+
 #iniciate id counter
 id = 0
 
@@ -55,7 +63,7 @@ while True:
             employee = models.employee(name)
 
             # Reset attendance if the day has changed
-            if (minute + 1) < ft.fetch_time_minute():
+            if (minute + reset_time) < ft.fetch_time_minute():
                 employee.reset_attendance()
                 minute = ft.fetch_time_minute()
 
@@ -64,8 +72,11 @@ while True:
             
             # Average the user recognition
             recognition_count[name] += 1  
-            if recognition_count[name] >= 100:
-                if not employee.check_attendance():
+            if recognition_count[name] >= avg_face_count:
+                 for reset in recognition_count:
+        # Reset the count for all names to zero
+                    recognition_count[reset] = 0
+            if not employee.check_attendance():
                     employee.send_telegram_msg(name)
                     isrecog = True
                     recogname = name
