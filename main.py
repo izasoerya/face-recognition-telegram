@@ -21,7 +21,7 @@ with open('threshold.txt', 'r') as file:
 id = 0
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(2)
+cam = cv2.VideoCapture(0)
 cam.set(3, 640) # set video widht
 cam.set(4, 480) # set video he  ight
 
@@ -58,7 +58,7 @@ while True:
 
         # Check if confidence is less than 100 ==> "0" is a perfect match
         confidence_text = round(100 - confidence)
-        if confidence_text >= 72 :
+        if confidence_text >= threshold :   
             name = models.user_attendance_list[id]
             employee = models.employee(name)
 
@@ -74,18 +74,18 @@ while True:
             recognition_count[name] += 1  
             if recognition_count[name] >= avg_face_count:
                  for reset in recognition_count:
-        # Reset the count for all names to zero
+            # Reset the count for all names to zero
                     recognition_count[reset] = 0
-            if not employee.check_attendance():
-                    employee.send_telegram_msg(name)
-                    isrecog = True
-                    recogname = name
-                recognition_count[name] = 0
+                    if not employee.check_attendance():
+                        employee.send_telegram_msg(name)
+                        isrecog = True
+                        recogname = name
+                    recognition_count[name] = 0
 
             if recognition_count[name] == 30:
                 isrecog = False
                 recogname = ""
-        elif confidence_text<72:
+        elif confidence_text<threshold:
             name = "unknown"
             confidence_text = "{0}%".format(confidence_text)
             cv2.putText(img, "Fixed your angle camera", (x+5, y+h+20), font, 1, (0, 0, 255), 2)
