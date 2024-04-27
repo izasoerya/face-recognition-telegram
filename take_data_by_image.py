@@ -39,7 +39,7 @@ for filename in os.listdir(database_dir):
         img = cv2.resize(img, (640, 480))
 
         # Detect faces in the cleaned image
-        faces = face_detector.detectMultiScale(cleaned_image, 1.3, 5)
+        faces = face_detector.detectMultiScale(cleaned_image, 1.3, 10)
 
         print(f"Number of faces detected in {filename}: {len(faces)}")  # Debugging statement
 
