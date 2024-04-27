@@ -1,5 +1,5 @@
 Sesuaikan nilai threshold presensi dengan mengganti angka di bawah
-35
+60
 
 Sesuaikan nilai reset telegram dalam menit:
 2

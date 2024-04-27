@@ -21,7 +21,7 @@ with open('threshold.txt', 'r') as file:
 id = 0
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(2)
 cam.set(3, 640) # set video widht
 cam.set(4, 480) # set video he  ight
 
