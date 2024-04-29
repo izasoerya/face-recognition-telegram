@@ -1,6 +1,7 @@
 import cv2
 import fetch_time as ft
 import models
+import telegram
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('trainer/trainer.yml')
@@ -16,12 +17,19 @@ with open('threshold.txt', 'r') as file:
     reset_time = int(threshold_lines[4].strip())
     avg_face_count = int(threshold_lines[7].strip())
 
-
+# Initialize variables
+recognition_count = {name: 0 for name in models.user_attendance_list}
+unknown_faces = []
+isabscence = 0
+minute = ft.fetch_time_minute()
+day = ft.fetch_date_day()
+isrecog = False
+recogname = ""
 #iniciate id counter
 id = 0
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(2)
+cam = cv2.VideoCapture(0)
 cam.set(3, 640) # set video widht
 cam.set(4, 480) # set video he  ight
 
@@ -29,19 +37,11 @@ cam.set(4, 480) # set video he  ight
 minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
 
-isabscence = 0
-minute = ft.fetch_time_minute()
-day = ft.fetch_date_day()
-
-recognition_count = {name: 0 for name in models.user_attendance_list}
-isrecog = False
-recogname = ""
-
 while True:
     ret, img = cam.read()
     img = cv2.flip(img, 1)  # Flip vertically
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
+    # Detect faces
     faces = faceCascade.detectMultiScale(
         gray,
         scaleFactor=1.2,
@@ -56,7 +56,7 @@ while True:
         # Use the entire face region for prediction
         id, confidence = recognizer.predict(gray[y:y+h, x:x+w])
 
-        # Check if confidence is less than 100 ==> "0" is a perfect match
+        # Check confidence level
         confidence_text = round(100 - confidence)
         if confidence_text >= threshold :   
             name = models.user_attendance_list[id]
@@ -89,11 +89,26 @@ while True:
             name = "unknown"
             confidence_text = "{0}%".format(confidence_text)
             cv2.putText(img, "Fixed your angle camera", (x+5, y+h+20), font, 1, (0, 0, 255), 2)
+            unknown_faces.append((x, y, w, h))
 
         if(isrecog):    
             cv2.putText(img, recogname + " telah hadir", (x+5, y+h+50), font, 1, (0, 0, 255), 2)
         cv2.putText(img, name, (x+5, y-5), font, 1, (255, 255, 255), 2)
         cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
+    
+     # Process unknown faces
+        
+    if len(unknown_faces) >= avg_face_count:
+        for reset in recognition_count:
+            recognition_count[reset] = 0  # Reset the count for all names to zero
+        for face_coords in unknown_faces:
+            x, y, w, h = face_coords
+            cv2.putText(img, "Unknown telah hadir", (x+5, y+h+50), font, 1, (0, 0, 255), 2)
+        # Send a Telegram notification for unknown faces
+        timestamp = ft.fetch_time_minute()
+        telegram.send_telegram_message(timestamp, is_unknown=True)
+        unknown_faces = []
+        
 
     print (recognition_count)
     cv2.imshow('camera', img)

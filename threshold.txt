@@ -1,8 +1,8 @@
 Sesuaikan nilai threshold presensi dengan mengganti angka di bawah
-60
+90
 
 Sesuaikan nilai reset telegram dalam menit:
 2
 
 Sesuaikan nilai averaging face count:
-100
+20

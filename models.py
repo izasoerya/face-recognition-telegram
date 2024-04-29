@@ -6,6 +6,8 @@ user_attendance = {
     "akmal" : False,
     "gilang" : False,
     "reza" : False,
+    
+    
 }
 user_attendance_list = list(user_attendance.keys())
 
