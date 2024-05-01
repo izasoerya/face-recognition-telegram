@@ -6,7 +6,7 @@ def send_telegram_message (message_content, is_unknown=False):
     if is_unknown:
         message = f"Unknown person detected! Please check the camera at {message_content}."
     else:
-        message = f"{message_content} telah hadir."
+        message = f"{message_content}"
     
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={message}%20telah%20hadir"
     print(requests.get(url).json())

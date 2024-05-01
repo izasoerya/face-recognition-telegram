@@ -24,6 +24,9 @@ isabscence = 0
 minute = ft.fetch_time_minute()
 day = ft.fetch_date_day()
 isrecog = False
+isrecogUnknown = False
+unknown = 0
+
 recogname = ""
 #iniciate id counter
 id = 0
@@ -82,27 +85,38 @@ while True:
                         recogname = name
                     recognition_count[name] = 0
 
-            if recognition_count[name] == 30:
+            if recognition_count[name] == avg_face_count / 2:
                 isrecog = False
                 recogname = ""
         elif confidence_text<threshold:
             name = "unknown"
             confidence_text = "{0}%".format(confidence_text)
             cv2.putText(img, "Fixed your angle camera", (x+5, y+h+20), font, 1, (0, 0, 255), 2)
-            unknown_faces.append((x, y, w, h))
+            unknown+=1
+            if unknown == 50: 
+                isrecogUnknown = False
+            if unknown >= 80:
+                isrecogUnknown = True
+                telegram.send_telegram_message('Unknown')
+
+                unknown = 0
+            # unknown_faces.append((x, y, w, h))
 
         if(isrecog):    
             cv2.putText(img, recogname + " telah hadir", (x+5, y+h+50), font, 1, (0, 0, 255), 2)
+        if (isrecogUnknown):
+            cv2.putText(img, "Unknown telah hadir", (x+5, y+h+50), font, 1, (0, 0, 255), 2)
         cv2.putText(img, name, (x+5, y-5), font, 1, (255, 255, 255), 2)
         cv2.putText(img, str(confidence_text), (x+5, y+h-5), font, 1, (255, 255, 0), 1)
     
      # Process unknown faces
-        
     if len(unknown_faces) >= avg_face_count:
         for reset in recognition_count:
             recognition_count[reset] = 0  # Reset the count for all names to zero
         for face_coords in unknown_faces:
             x, y, w, h = face_coords
+            isrecogUnknown = True
+        if(isrecogUnknown):    
             cv2.putText(img, "Unknown telah hadir", (x+5, y+h+50), font, 1, (0, 0, 255), 2)
         # Send a Telegram notification for unknown faces
         timestamp = ft.fetch_time_minute()
