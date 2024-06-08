@@ -1,11 +1,16 @@
 import telegram
 
 user_attendance = {
-    "faiz" : False,
-    "iza" : False,
-    "akmal" : False,
-    "gilang" : False,
-    "reza" : False,
+    "aaa" : False,
+    "akbaresa" : False,
+    "alfianto" : False,
+    "bima" : False,
+    "budiyanto" : False,
+    "kenrio" : False,
+    "kukuh" : False,
+    "rana" : False,
+    "Raul" : False,
+    "riski mas" : False,
     
     
 }
