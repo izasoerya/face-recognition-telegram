@@ -28,7 +28,7 @@ unknown = 0
 recogname = ""
 
 # Initialize and start realtime video capture
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
 cam.set(3, 640)  # set video width
 cam.set(4, 480)  # set video height
 

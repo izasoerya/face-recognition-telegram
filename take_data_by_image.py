@@ -28,12 +28,12 @@ folder_to_user_id = {
     'akbaresa': 'User1',
     'alfianto': 'User2',
     'bima': 'User3',
-    'budiyanto': 'User4',
-    'kenrio': 'User5',
-    'kukuh': 'User6',
-    'rana': 'User7',
-    'Raul': 'User8',
-    'riski mas': 'User9'
+    'hhh': 'User4',
+    'kukuh': 'User5',
+    'rana': 'User6',
+    'Raul': 'User7',
+    'riski mas': 'User8'
+
 }
 
 # Create dataset directory if it doesn't exist
@@ -62,7 +62,7 @@ for subfolder in os.listdir(main_dir):
                 img = cv2.resize(img, (640, 480))
 
                 # Detect faces in the cleaned image
-                faces = face_detector.detectMultiScale(cleaned_image, scaleFactor=1.1, minNeighbors=5,)
+                faces = face_detector.detectMultiScale(cleaned_image, scaleFactor=1.2, minNeighbors=10,)
 
                 print(f"Number of faces detected in {filename}: {len(faces)}")  # Debugging statement
 
