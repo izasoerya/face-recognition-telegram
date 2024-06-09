@@ -43,7 +43,7 @@ while True:
     # Detect faces
     faces = faceCascade.detectMultiScale(
         gray,
-        scaleFactor=2.8,
+        scaleFactor=1.5,
         minNeighbors=5, 
         minSize=(int(minW), int(minH)),
     )

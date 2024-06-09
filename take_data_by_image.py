@@ -1,11 +1,13 @@
 import cv2
 import os
 
-# Function to clean image by removing noise
+# Function to clean image by removing noise and apply histogram equalization
 def clean_image(image):
     # Apply Gaussian Blur to reduce noise
-    blurred_image = cv2.GaussianBlur(image, (5, 5), 0)
-    return blurred_image
+    blurred_image = cv2.GaussianBlur(image, (7, 7), 0)
+    # Apply histogram equalization
+    equalized_image = cv2.equalizeHist(blurred_image)
+    return equalized_image
 
 # Initialize face detector
 face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.xml')
@@ -14,8 +16,8 @@ face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.
 main_dir = 'lek1/'
 
 # Define the offset percentages for width and height adjustments
-offsetPercentageW = 5  # Adjust this value according to your requirements
-offsetPercentageH = 5  # Adjust this value according to your requirements
+offsetPercentageW = 10  # Adjust this value according to your requirements
+offsetPercentageH = 10  # Adjust this value according to your requirements
 
 count = 0  # Initialize face count
 max_samples = 600  # Maximum number of face samples to capture
@@ -53,17 +55,14 @@ for subfolder in os.listdir(main_dir):
 
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-                # Clean the image by removing noise
+                # Clean the image by removing noise and applying histogram equalization
                 cleaned_image = clean_image(gray)
-
-                # Apply normalization for better image quality
-                cleaned_image = cv2.equalizeHist(cleaned_image)
 
                 # Resize image to a uniform size
                 img = cv2.resize(img, (640, 480))
 
                 # Detect faces in the cleaned image
-                faces = face_detector.detectMultiScale(cleaned_image, 1.3, 10)
+                faces = face_detector.detectMultiScale(cleaned_image, scaleFactor=1.1, minNeighbors=5,)
 
                 print(f"Number of faces detected in {filename}: {len(faces)}")  # Debugging statement
 
